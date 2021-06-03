@@ -26,6 +26,7 @@ class CustomerController extends Controller
                         ->where('model_has_roles.role_id','=',3)
                         ->where('users.is_deleted','=','N')
                         ->select('users.*')
+                        ->orderBy('users.created_at','DESC')
                         ->get();
         return view('customer.list', [ 
             'allCustomers' => $allCustomers
@@ -104,7 +105,7 @@ class CustomerController extends Controller
         $editInfo = User::Where('users.id',$id)
                     ->with('lawyerDetails','ratings','ratings.customer','questionAnswer','questionAnswer.customer')
                     ->first();
-                    // echo json_encode($editInfo);die;
+                    // echo json_encode($editInfo);die; 
         $courtArray = [];$primaryPracticeArray = [];$expertiseInfoArray=[];
         if($editInfo && $editInfo->lawyer_details && $editInfo->lawyer_details->court_id !==''){
             $courtInfo = DB::table('court_masters')
