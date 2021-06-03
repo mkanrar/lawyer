@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\lawyer\Lawyer_primary_practice_master;
+use App\Models\lawyer\Court_master;
 use App\User;
+use App\Models\lawyer\Lawyer_detail;
 use URL;
 use DB;
 use Redirect, \Validator;
 use App\Library\config_inc;
+use Illuminate\Support\Facades\Hash;
 
 
 class Common extends Controller
@@ -29,6 +32,23 @@ class Common extends Controller
             $arrayList[$i]['id'] = $getPracticeMasterAll->id;
             $arrayList[$i]['name'] = $getPracticeMasterAll->name;
             $arrayList[$i]['image'] = URL::to('/assets/uploades/primary_practice/thumb/'.$getPracticeMasterAll->image);
+            $i++;
+        }
+        return response()->json([
+            'status' => 1,
+            'data' => [
+                'list'=> $arrayList
+            ]
+        ], 200);
+    }
+    public function getCourtList(){
+        //dd(uniqid());
+        $getCourtMaster = Court_master::select('id','name',)->where('status', 1)->orderBy('id','DESC')->get();
+        $arrayList =[];
+        $i = 0;
+        foreach($getCourtMaster as $getCourtMasterAll){
+            $arrayList[$i]['id'] = $getCourtMasterAll->id;
+            $arrayList[$i]['name'] = $getCourtMasterAll->name;
             $i++;
         }
         return response()->json([
@@ -141,15 +161,15 @@ class Common extends Controller
             if($hasLawyer)
             {
                 $editInfo = User::Where('users.id',$id)
-                        ->with('lawyer_details','ratings','ratings.customer','questionAnswer','questionAnswer.customer')
+                        ->with('lawyerDetails','ratings','ratings.customer','questionAnswer','questionAnswer.customer')
                         ->first();
                         
-                        // return response()->json($editInfo);
+                    // return response()->json($editInfo);
                 $courtArray = [];$primaryPracticeArray = [];$expertiseInfoArray=[];
                 if($editInfo && $editInfo->lawyer_details && $editInfo->lawyer_details->court_id !==''){
-                    $courtInfo = DB::table('court_master')
-                                ->WhereIn('court_id',explode(',', $editInfo->lawyer_details->court_id))
-                                ->select('court_master.name')
+                    $courtInfo = DB::table('court_masters')
+                                ->WhereIn('id',explode(',', $editInfo->lawyer_details->court_id))
+                                ->select('court_masters.name')
                                 ->get();
                     $courtInfo = $courtInfo->toArray();
                     
@@ -282,33 +302,121 @@ class Common extends Controller
         }
         else
         {
-        $editInfo = User::Where('users.id',$user_id)
-                        ->with('lawyer_details')
-                        ->first();
-        $primaryDetails = [
-            'name' => $editInfo->name,
-            'email' => $editInfo->email,
-            'mobile_no' => $editInfo->mobile_no,
-            'city' => $editInfo->city,
-            'date_of_birth' => $editInfo->date_of_birth,
-            'address'=> $editInfo->address,
-            
-        ];
-        if($editInfo && $editInfo->lawyer_details){
-            $primaryDetails['education'] = $editInfo->lawyer_details->education;
-            $primaryDetails['year_of_experience'] = $editInfo->lawyer_details->year_of_experience;
-            $primaryDetails['office_address'] = $editInfo->lawyer_details->office_address;
-            $primaryDetails['profile_description'] = $editInfo->lawyer_details->profile_description;
-            $primaryDetails['year_of_passing'] = $editInfo->lawyer_details->year_of_passing;
+            $editInfo = User::Where('users.id',$user_id)
+                            ->with('lawyer_details')
+                            ->first();
+            $primaryDetails = [
+                'name' => $editInfo->name,
+                'email' => $editInfo->email,
+                'mobile_no' => $editInfo->mobile_no,
+                'city' => $editInfo->city,
+                'date_of_birth' => $editInfo->date_of_birth,
+                'address'=> $editInfo->address,
+                
+            ];
+            if($editInfo && $editInfo->lawyer_details){
+                $primaryDetails['education'] = $editInfo->lawyer_details->education;
+                $primaryDetails['year_of_experience'] = $editInfo->lawyer_details->year_of_experience;
+                $primaryDetails['office_address'] = $editInfo->lawyer_details->office_address;
+                $primaryDetails['profile_description'] = $editInfo->lawyer_details->profile_description;
+                $primaryDetails['year_of_passing'] = $editInfo->lawyer_details->year_of_passing;
+            }
+
+            $response['status_code'] = 1;
+            $response['status'] = 'Success';
+            $response['data']['user'] = $primaryDetails;
         }
-        return response()->json([
-            'status_code' => 1,
-            'status' => 'Success',
-            'data' => [
-                'user' => $primaryDetails,
-            ]
-        ], 200);
+        return response()->json($response);
     }
-}
-    
+    //To Update the profile
+    public function updateProfile(Request $request)
+    {
+        $user_id = $request->user_id;
+        $validator   = Validator::make($request->all(),
+                                        [
+                                            'user_id'   => 'required'
+                                        ]);
+        
+        if($validator->fails()){
+            $response['status_code'] = 0;
+            $response['status'] = 'Valid User id required';
+            $response['data'] = [];
+        }else{
+        $users = array();
+        $lawyer_details = array();
+        if($request->name){
+            $users['name'] =  $request->name;
+            $users['first_name'] =  $request->name;
+        }
+        if($request->mobile_no){
+            $users['mobile_no'] =  $request->mobile_no;
+        }
+        if($request->password){
+            $users['password'] =  Hash::make($request->password);
+        }
+        if($request->gender){
+            $users['gender'] =  $request->gender;
+        }
+        if($request->city){
+            $users['city'] =  $request->city;
+        }
+        if($request->date_of_birth){
+            $users['date_of_birth'] =  $request->date_of_birth;
+        }
+        if($request->current_latitude){
+            $users['current_latitude'] = $request->current_latitude;
+        }
+        if($request->current_longitude){
+            $users['current_longitude'] =  $request->current_longitude;
+        }
+        if($request->updated_at){
+            $users['updated_at'] =  date_format($request->updated_at,"Y/m/d H:i:s");
+        }
+
+        if($request->education){
+            $lawyer_details['education'] = $request->education;
+        }
+        if($request->year_of_experience){
+            $lawyer_details['year_of_experience'] = $request->year_of_experience;
+        }
+        if($request->primary_practice_id){
+            $lawyer_details['primary_practice_id'] = $request->primary_practice_id;
+        }
+        if($request->office_address){
+            $lawyer_details['office_address'] = $request->office_address;
+        }
+        if($request->court_id){
+            $lawyer_details['court_id'] = $request->court_id;
+        }
+        if($request->enroll_number){
+            $lawyer_details['enroll_number'] = $request->enroll_number;
+        }
+        if($request->year_of_passing){
+            $lawyer_details['year_of_passing'] = $request->year_of_passing;
+        }
+        
+        $userExist = User::Where('users.id',$user_id)->count();
+        $lawyer_detailsCount = DB::table('lawyer_details')->Where('lawyer_details.user_id',$user_id)->count();
+        
+        if($userExist > 0 && $users){
+            $sql = DB::table('users')->Where('id',$user_id)->update($users);
+            $response['status_code'] = 1;
+            $response['status'] = 'Updated Successfully';
+            $response['data'] = [];
+        }else{
+            $response['status_code'] = 0;
+            $response['status'] = 'User id not vaild';
+            $response['data'] = [];
+        }
+        if($lawyer_detailsCount > 0 && $lawyer_details)
+        {
+            $sql = DB::table('lawyer_details')->Where('user_id',$user_id)->update($lawyer_details);
+            $response['status_code'] = 1;
+            $response['status'] = 'Updated Successfully';
+            $response['data'] = [];
+        }
+        
+    }
+       return response()->json($response);  
+    }    
 }

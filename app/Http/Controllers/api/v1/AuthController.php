@@ -34,7 +34,9 @@ class AuthController extends Controller
                         'current_longitude'=>$request->longitude
                     ]);
                 }
-                $accessToken = Auth::user()->createToken('authToken')->accessToken;
+                $accessToken = sha1(mt_rand(1, 90000000000) . 'SALT');
+                // $accessToken = Auth::user()->createToken('authToken')->accessToken;
+                
                 return response()->json([
                     'status_code' => 1,
                     'status' => 'User successfully logged in',

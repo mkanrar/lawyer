@@ -19,9 +19,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::group(['prefix'=>'/v1', 'namespace' => 'api\v1'], function(){
     Route::get('/lawyer-primary-practice-list', 'Common@getLawyerPrimaryPracticeList');
+    Route::get('/court-list', 'Common@getCourtList');
     Route::get('/featured-lawyer', 'Common@getFeaturedLawyer');
     Route::post('/all-lawyers', 'Common@LawyersList');
     Route::post('/edit-profile', 'Common@editProfile');
+    Route::post('/update-profile', 'Common@updateProfile');
     Route::get('/dashboard-content', 'Common@getDashboradContent');
     Route::group(['prefix'=>'/auth'], function(){
         Route::post('/login', 'AuthController@login');

@@ -102,14 +102,14 @@ class CustomerController extends Controller
     }
     public function editlawyer($id) {
         $editInfo = User::Where('users.id',$id)
-                    ->with('lawyer_details','ratings','ratings.customer','questionAnswer','questionAnswer.customer')
+                    ->with('lawyerDetails','ratings','ratings.customer','questionAnswer','questionAnswer.customer')
                     ->first();
                     // echo json_encode($editInfo);die;
         $courtArray = [];$primaryPracticeArray = [];$expertiseInfoArray=[];
         if($editInfo && $editInfo->lawyer_details && $editInfo->lawyer_details->court_id !==''){
-            $courtInfo = DB::table('court_master')
-                        ->WhereIn('court_id',explode(',', $editInfo->lawyer_details->court_id))
-                        ->select('court_master.name')
+            $courtInfo = DB::table('court_masters')
+                        ->WhereIn('id',explode(',', $editInfo->lawyer_details->court_id))
+                        ->select('court_masters.name')
                         ->get();
             $courtInfo = $courtInfo->toArray();
             
@@ -179,7 +179,7 @@ class CustomerController extends Controller
         }
         $primaryDetails=[
             'name' => $editInfo->name,
-            'profile_pic' => URL::to('/assets/uploades/profile/thumb/'.$profilePic),
+            'profile_pic' => URL::to('/public/assets/uploades/profile/thumb/'.$profilePic),
             'email' => $editInfo->email,
             'mobile_no' => $editInfo->mobile_no,
             'city' => $editInfo->city,
@@ -238,6 +238,8 @@ class CustomerController extends Controller
      }
     public function update(Request $request)
     {
+        error_reporting(E_ALL);
+        ini_set("display_errors", 1);
         $lawyer_id = $request->lawyer_id;
         $lawyer_image = $request->file('lawyer_image');
         if($request->hasFile('lawyer_image')){
@@ -248,12 +250,12 @@ class CustomerController extends Controller
                 
                 if (in_array($ext, $allowed_image_types))
                 {
-                    $lawyer_image_a = time().$filename;
+                   $lawyer_image_a = time().$filename;
                     // $mediumthumbnailpath = public_path('/assets/uploades/contents/thumb/'.$lawyer_image_a);
                     // $this->createThumbnail($mediumthumbnailpath, 300, 185);
                     Image::make($lawyer_image)->resize(300, null, function ($constraint) {$constraint->aspectRatio();})->save( public_path('/assets/uploades/profile/thumb/' . $lawyer_image_a) );
                 }
-                
+                die;
                 DB::table('users')
                 ->Where('id',$lawyer_id)
                 ->update(

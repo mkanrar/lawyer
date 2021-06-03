@@ -46,7 +46,7 @@
                                     <td>{{$_Contents->name}}</td>
                                     <td>
                                         <div class="image">
-                                            <img src="{{url('/assets/uploades/primary_practice/thumb/'.$_Contents->image)}}" alt="Image Not Found" class='img-circle elevation-2' width="50px">
+                                            <img src="{{url('/public/assets/uploades/primary_practice/thumb/'.$_Contents->image)}}" alt="Image Not Found" class='img-circle elevation-2' width="50px">
                                             
                                         </div>
                                     </td>

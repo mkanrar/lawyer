@@ -50,10 +50,10 @@
                                     <td>
                                         <div class="image">
                                             @if($_contomer && $_contomer->image !=="")
-                                            <img style="width: 40px;" src={{url("/assets/uploades/profile/thumb/".$_contomer->image)}}
+                                            <img style="width: 40px;" src={{url("/public/assets/uploades/profile/thumb/".$_contomer->image)}}
                                                 class="img-circle elevation-2" alt="User Image">
                                             @else
-                                            <img style="width: 40px;" src={{url("/assets/uploades/profile/thumb/default.png")}}
+                                            <img style="width: 40px;" src={{url("/public/assets/uploades/profile/thumb/default.png")}}
                                                 class="img-circle elevation-2" alt="User Image">
                                             @endif
                                         </div>

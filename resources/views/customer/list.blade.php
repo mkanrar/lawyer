@@ -49,7 +49,7 @@
                                     <td>{{$_contomer->name}}</td>
                                     <td>
                                         <div class="image">
-                                            <img style="width: 40px;" src={{url("/assets/dist/img/avatar4.png")}}
+                                            <img style="width: 40px;" src={{url("/public/assets/dist/img/avatar4.png")}}
                                                 class="img-circle elevation-2" alt="User Image">
                                         </div>
                                     </td>

@@ -48,7 +48,7 @@
                                     <td>{{$_Contents->description}}</td>
                                     <td>
                                         <div class="image">
-                                            <img src="{{url('/assets/uploades/contents/thumb/'.$_Contents->image)}}" alt="Image Not Found" class='img-circle elevation-2' width="50px">
+                                            <img src="{{url('/public/assets/uploades/contents/thumb/'.$_Contents->image)}}" alt="Image Not Found" class='img-circle elevation-2' width="50px">
                                             {{-- {{ HTML::image('/assets/uploades/contents/thumb/'.$_Contents->image, 'Image Not Found', array('class' => 'img-circle elevation-2', 'style'=> 'width:40px' )) }} --}}
                                            
                                         </div>

@@ -66,9 +66,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\reviewRatings'::class);
     }
-    public function lawyer_details()
+    public function lawyerDetails()
     {
-        return $this->hasOne('App\Models\lawyer\Lawyer_detail'::class);
+        return $this->hasOne('App\Models\lawyer\LawyerDetail'::class);
     }
     public function questionAnswer()
     {
